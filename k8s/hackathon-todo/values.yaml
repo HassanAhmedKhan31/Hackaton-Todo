@@ -18,5 +18,4 @@ secrets:
   # Values will be injected from environment or set manually during install
   # helm install ... --set secrets.databaseUrl=... --set secrets.openaiApiKey=...
   databaseUrl: "postgresql://neondb_owner:npg_zJWhtTuCL67g@ep-silent-wave-adpc6smg-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require"
-  openaiApiKey: "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"
   openrouterApiKey: "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"
