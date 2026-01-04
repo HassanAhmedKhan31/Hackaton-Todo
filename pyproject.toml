@@ -1,0 +1,9 @@
+[project]
+name = "hackathon-todo"
+version = "0.1.0"
+description = "A todo app for a hackathon"
+dependencies = [
+    "openai",
+    "mcp",
+    "python-dotenv"
+]

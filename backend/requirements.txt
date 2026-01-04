@@ -1,0 +1,9 @@
+# Task ID: T-016
+fastapi
+sqlmodel
+uvicorn[standard]
+openai
+mcp
+python-dotenv
+psycopg2-binary
+requests

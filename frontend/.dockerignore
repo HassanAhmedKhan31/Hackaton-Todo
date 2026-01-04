@@ -1,0 +1,7 @@
+# Task ID: T-016
+node_modules
+.next
+.env
+.git
+.dockerignore
+Dockerfile

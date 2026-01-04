@@ -1,0 +1,13 @@
+# Task ID: T-018
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-backend
+spec:
+  type: {{ .Values.backend.service.type }}
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

@@ -1,0 +1,6 @@
+# Task ID: T-016
+__pycache__
+.venv
+.env
+.git
+*.db
