@@ -20,6 +20,17 @@ spec:
       - name: backend
         image: hackathon-backend:latest
         imagePullPolicy: Never
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-secrets
+              key: DATABASE_URL
+        - name: OPENROUTER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: todo-app-secrets
+              key: OPENROUTER_API_KEY
         ports:
         - containerPort: 8000
 ---

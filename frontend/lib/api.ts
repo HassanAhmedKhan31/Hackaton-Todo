@@ -10,8 +10,8 @@ export interface Task {
   user_id?: string;
 }
 
-const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+export const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });
 
 export const getTasks = async (): Promise<Task[]> => {

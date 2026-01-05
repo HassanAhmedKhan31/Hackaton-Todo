@@ -2,7 +2,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send } from 'lucide-react';
-import axios from 'axios';
+import { api } from '../lib/api';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -33,7 +33,7 @@ export default function ChatInterface() {
     setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/api/chat', {
+      const response = await api.post('/chat', {
         message: userMessage,
       });
 
