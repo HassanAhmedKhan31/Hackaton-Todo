@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-recurring
+  labels:
+    app: recurring-service
+spec:
+  replicas: {{ .Values.recurringService.replicas }}
+  selector:
+    matchLabels:
+      app: recurring-service
+  template:
+    metadata:
+      labels:
+        app: recurring-service
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "recurring-service"
+        dapr.io/app-port: "8002"
+    spec:
+      containers:
+      - name: recurring-service
+        image: "{{ .Values.recurringService.image.repository }}:{{ .Values.recurringService.image.tag | default .Values.global.imageTag }}"
+        imagePullPolicy: {{ .Values.recurringService.image.pullPolicy }}
+        ports:
+        - containerPort: 8002

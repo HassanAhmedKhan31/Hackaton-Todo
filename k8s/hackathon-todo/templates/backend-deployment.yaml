@@ -1,9 +1,12 @@
+# Task ID: T-018
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-app-backend
+  name: {{ .Release.Name }}-backend
+  labels:
+    app: backend
 spec:
-  replicas: 1
+  replicas: {{ .Values.backend.replicas }}
   selector:
     matchLabels:
       app: backend
@@ -12,36 +15,30 @@ spec:
       labels:
         app: backend
       annotations:
-        dapr.io/enabled: "true"
+        dapr.io/enabled: "false"
         dapr.io/app-id: "backend"
         dapr.io/app-port: "8000"
     spec:
       containers:
       - name: backend
-        image: hackathon-backend:latest
-        imagePullPolicy: Never
+        image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Values.global.imageTag }}"
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
         env:
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: todo-app-secrets
+              name: {{ .Release.Name }}-secrets
               key: DATABASE_URL
         - name: OPENROUTER_API_KEY
           valueFrom:
             secretKeyRef:
-              name: todo-app-secrets
+              name: {{ .Release.Name }}-secrets
               key: OPENROUTER_API_KEY
+        # Also map OPENAI_API_KEY if needed, mirroring secrets.yaml
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-secrets
+              key: OPENAI_API_KEY
         ports:
         - containerPort: 8000
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: todo-app-backend
-spec:
-  selector:
-    app: backend
-  ports:
-  - protocol: TCP
-    port: 8000
-    targetPort: 8000

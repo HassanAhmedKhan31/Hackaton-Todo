@@ -8,11 +8,35 @@ export interface Task {
   description?: string;
   status: string;
   user_id?: string;
+  is_recurring?: boolean;
+  recurrence_interval?: string;
+  remind_at?: string; // Assuming string for simplicity, can be Date
 }
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });
+
+console.log('API Base URL:', api.defaults.baseURL);
+
+// Request Interceptor
+api.interceptors.request.use((config) => {
+  console.log(`Starting Request: ${config.method?.toUpperCase()} ${config.url}`);
+  return config;
+});
+
+// Response Interceptor
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error(`Request Failed: ${error.config?.url}`, error.message);
+    if (error.response) {
+      console.error('Status:', error.response.status);
+      console.error('Data:', error.response.data);
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const getTasks = async (): Promise<Task[]> => {
   const response = await api.get('/tasks/');

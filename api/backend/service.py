@@ -5,8 +5,8 @@ from backend.models import Task
 
 class TodoService:
     @staticmethod
-    def create_task(session: Session, title: str, description: Optional[str] = None) -> Task:
-        task = Task(title=title, description=description)
+    def create_task(session: Session, title: str, description: Optional[str] = None, user_id: Optional[str] = None, is_recurring: bool = False, recurrence_interval: Optional[str] = None, remind_at: Optional[str] = None) -> Task:
+        task = Task(title=title, description=description, user_id=user_id, is_recurring=is_recurring, recurrence_interval=recurrence_interval, remind_at=remind_at)
         session.add(task)
         session.commit()
         session.refresh(task)
@@ -24,7 +24,7 @@ class TodoService:
         return session.get(Task, task_id)
 
     @staticmethod
-    def update_task(session: Session, task_id: int, status: Optional[str] = None, title: Optional[str] = None, description: Optional[str] = None) -> Optional[Task]:
+    def update_task(session: Session, task_id: int, status: Optional[str] = None, title: Optional[str] = None, description: Optional[str] = None, is_recurring: Optional[bool] = None, recurrence_interval: Optional[str] = None, remind_at: Optional[str] = None) -> Optional[Task]:
         task = session.get(Task, task_id)
         if not task:
             return None
@@ -35,6 +35,12 @@ class TodoService:
             task.description = description
         if status is not None:
             task.status = status
+        if is_recurring is not None:
+            task.is_recurring = is_recurring
+        if recurrence_interval is not None:
+            task.recurrence_interval = recurrence_interval
+        if remind_at is not None:
+            task.remind_at = remind_at
             
         session.add(task)
         session.commit()

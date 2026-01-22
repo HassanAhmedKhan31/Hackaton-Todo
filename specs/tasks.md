@@ -135,7 +135,7 @@
 2. Ensure images are available to Minikube (e.g., via `minikube docker-env` or loading images).
 **Verification:** Run `kubectl get pods` to see them running.
 
-### Task ID: T-020
+### Task ID: T-020 [COMPLETED]
 **Objective:** Verification.
 **Files:** N/A
 **Description:**
@@ -146,13 +146,43 @@
 ## Phase V: Advanced Cloud & Event-Driven Architecture
 
 ### Task ID: T-021
-**Objective:** Install Dapr on Minikube.
-**Files:** N/A (CLI Commands)
-**Description:** Install Dapr CLI and initialize it in the Kubernetes cluster.
-**Verification:** `kubectl get pods -n dapr-system` shows running pods.
+**Objective:** Install Dapr & Kafka Infrastructure.
+**Files:** `k8s/kafka-cluster.yaml`, `backend/fast-kafka.yaml` (Dapr component)
+**Description:**
+1. Install Dapr on Minikube (`dapr init -k`).
+2. Deploy Kafka (Strimzi) and a Kafka Cluster.
+3. Define Dapr Component `pubsub` wrapping the Kafka cluster.
+**Verification:** `kubectl get components` shows `pubsub` successfully initialized.
 
 ### Task ID: T-022
-**Objective:** Install Kafka (Strimzi) on Minikube.
-**Files:** `k8s/kafka-cluster.yaml`
-**Description:** Deploy the Strimzi Operator and a minimalistic Kafka cluster.
-**Verification:** `kubectl get pods -n kafka` shows the Kafka cluster running.
+**Objective:** Update Data Model & Backend Logic.
+**Files:** `backend/models.py`, `backend/service.py`, `backend/requirements.txt`
+**Description:**
+1. Update `Task` model with `is_recurring`, `recurrence_interval`, `due_date`.
+2. Add `dapr-client` to `requirements.txt`.
+3. Update `service.py`: When a task is completed, publish `TaskCompleted` event to `pubsub`.
+**Verification:** Check logs or Dapr dashboard to see events being published upon task completion.
+
+### Task ID: T-023
+**Objective:** Recurring Task Engine Service.
+**Files:** `backend/services/recurring_engine.py`, `backend/main.py`
+**Description:**
+1. Create a new module/service `recurring_engine` that subscribes to `TaskCompleted`.
+2. Logic: If `task.is_recurring` is True, calculate next due date and call `create_task`.
+**Verification:** Complete a recurring task in UI. Verify a new task appears automatically.
+
+### Task ID: T-024
+**Objective:** Notification Service.
+**Files:** `backend/services/notifications.py`
+**Description:**
+1. Create a subscriber for `TaskCreated` (or `TaskReminders`).
+2. Log a "SENDING EMAIL" message when a task with a due date is created or due.
+**Verification:** Create a task with due date. Check logs for the notification message.
+
+### Task ID: T-025
+**Objective:** Helm Chart Updates & CI/CD.
+**Files:** `k8s/hackathon-todo/templates/`, `.github/workflows/deploy.yaml`
+**Description:**
+1. Update Deployments to include `dapr.io/*` annotations.
+2. Create a GitHub Action to build images and deploy to DigitalOcean (DOKS).
+**Verification:** Helm template renders Dapr annotations. Action passes linting.

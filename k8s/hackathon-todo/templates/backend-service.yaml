@@ -8,6 +8,9 @@ spec:
   selector:
     app: backend
   ports:
-    - protocol: TCP
-      port: 8000
-      targetPort: 8000
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+    {{- if eq .Values.backend.service.type "NodePort" }}
+    nodePort: 30001
+    {{- end }}

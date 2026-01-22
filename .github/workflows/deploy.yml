@@ -1,0 +1,89 @@
+name: Build and Deploy to DOKS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: docker.io
+  # Replace with your Docker Hub username
+  IMAGE_OWNER: your-dockerhub-username
+  CLUSTER_NAME: hackathon-cluster
+  HELM_RELEASE_NAME: hackathon-todo
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set Image Tag
+        run: echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build and Push Backend
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_OWNER }}/hackathon-backend:${{ env.IMAGE_TAG }}
+
+      - name: Build and Push Frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_OWNER }}/hackathon-frontend:${{ env.IMAGE_TAG }}
+
+      - name: Build and Push Notification Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend/notification_service
+          file: ./backend/notification_service/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_OWNER }}/notification-service:${{ env.IMAGE_TAG }}
+
+      - name: Build and Push Recurring Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend/recurring_service
+          file: ./backend/recurring_service/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_OWNER }}/recurring-service:${{ env.IMAGE_TAG }}
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Save DigitalOcean Kubeconfig
+        run: doctl kubernetes cluster kubeconfig save ${{ env.CLUSTER_NAME }}
+
+      - name: Update secrets in cluster
+        # Only if you want to manage secrets via CI/CD (basic approach)
+        # Better to use external secrets or manual setup for production
+        run: |
+          kubectl create secret generic ${{ env.HELM_RELEASE_NAME }}-secrets \
+            --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            --from-literal=OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" \
+            --from-literal=OPENROUTER_API_KEY="${{ secrets.OPENROUTER_API_KEY }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install ${{ env.HELM_RELEASE_NAME }} ./k8s/hackathon-todo \
+            --set global.imageTag=${{ env.IMAGE_TAG }} \
+            --set backend.image.repository=${{ env.IMAGE_OWNER }}/hackathon-backend \
+            --set frontend.image.repository=${{ env.IMAGE_OWNER }}/hackathon-frontend \
+            --set notificationService.image.repository=${{ env.IMAGE_OWNER }}/notification-service \
+            --set recurringService.image.repository=${{ env.IMAGE_OWNER }}/recurring-service \
+            --set ingress.hosts[0].host=todo.yourdomain.com # Change to your domain or LoadBalancer IP

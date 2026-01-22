@@ -14,6 +14,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # because the code uses 'from backend.database ...'
 COPY . ./backend/
 
+# Copy the schema migration script
+COPY fix_schema.py .
+
 # Expose port
 EXPOSE 8000
 

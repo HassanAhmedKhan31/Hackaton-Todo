@@ -1,0 +1,14 @@
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  name: appconfig
+spec:
+  mtls:
+    enabled: true
+    # Standard Dapr defaults required when mtls is enabled
+    controlPlaneTrustDomain: "cluster.local"
+    sentryAddress: "dapr-sentry.dapr-system.svc.cluster.local:80"
+  tracing:
+    samplingRate: "1"
+    zipkin:
+      endpointAddress: "http://dapr-dev-zipkin.default.svc.cluster.local:9411/api/v2/spans"

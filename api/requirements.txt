@@ -7,3 +7,5 @@ mcp
 python-dotenv
 psycopg2-binary
 requests
+dapr
+dapr-ext-fastapi

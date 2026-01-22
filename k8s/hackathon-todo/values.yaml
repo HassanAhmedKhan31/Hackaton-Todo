@@ -1,21 +1,76 @@
+# Task ID: T-026 (Cloud Deployment)
+# Default values for hackathon-todo.
+
+global:
+  imageTag: "latest" # Default tag, overridden by CI/CD
+
 backend:
-  image: hackathon-backend:latest
-  pullPolicy: Never   # <--- FIX 1: Forces K8s to use your local image
+  name: backend
+  image:
+    repository: hackathon-backend
+    tag: "latest"
+    pullPolicy: Never
   replicas: 1
   service:
     type: ClusterIP
     port: 8000
 
 frontend:
-  image: hackathon-frontend:latest
-  pullPolicy: Never   # <--- FIX 1: Forces K8s to use your local image
+  name: frontend
+  image:
+    repository: hackathon-frontend
+    tag: "latest"
+    pullPolicy: Never
   replicas: 1
   service:
-    type: NodePort
+    type: ClusterIP
     port: 3000
+  apiUrl: "/api"
+
+notificationService:
+  name: notification-service
+  image:
+    repository: notification-service
+    tag: "latest"
+    pullPolicy: Never
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 8001
+
+recurringService:
+  name: recurring-service
+  image:
+    repository: recurring-service
+    tag: "latest"
+    pullPolicy: Never
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 8002
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: todo.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+          port: 3000
+        - path: /api
+          pathType: Prefix
+          service: backend
+          port: 8000
+  # TLS configuration if needed
+  # tls:
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
 
 secrets:
-  # Values will be injected from environment or set manually during install
-  # helm install ... --set secrets.databaseUrl=... --set secrets.openaiApiKey=...
-  databaseUrl: "postgresql://neondb_owner:npg_zJWhtTuCL67g@ep-silent-wave-adpc6smg-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require"
-  openrouterApiKey: "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"
+  # These should be overridden by --set during helm install
+  databaseUrl: "postgresql://user:password@host:port/db"
+  openaiApiKey: "sk-..."
+  openrouterApiKey: "sk-..."

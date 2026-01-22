@@ -1,4 +1,3 @@
-// Fix T-015
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send } from 'lucide-react';
@@ -9,7 +8,11 @@ interface Message {
   content: string;
 }
 
-export default function ChatInterface() {
+interface ChatInterfaceProps {
+  fetchTasks: () => Promise<void>;
+}
+
+export default function ChatInterface({ fetchTasks }: ChatInterfaceProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -32,18 +35,23 @@ export default function ChatInterface() {
     setInput('');
     setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
+    
     try {
-      const response = await api.post('/chat', {
-        message: userMessage,
-      });
+      const response = await api.post('/chat', { message: userMessage });
+      const assistantMessage = response.data.response;
 
       setMessages((prev) => [
         ...prev,
-        {
-          role: 'assistant',
-          content: response.data.response,
-        },
+        { role: 'assistant', content: assistantMessage },
       ]);
+
+      // Check if the assistant's message indicates a successful task operation
+      const refreshKeywords = ['processed', 'created', 'updated', 'deleted', 'completed', 'task processed successfully'];
+      if (refreshKeywords.some(keyword => assistantMessage.toLowerCase().includes(keyword))) {
+        console.log("Assistant response triggered a task refresh.");
+        await fetchTasks();
+      }
+
     } catch (error) {
       console.error('Chat error:', error);
       setMessages((prev) => [

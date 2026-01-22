@@ -1,14 +1,12 @@
 # Task ID: T-017
-# Build Script for Hackathon Todo Images
+# Build Automation Script for Local Kubernetes
+# This script builds the Docker images and makes them available to Minikube.
 
-Write-Host "Building Hackathon Todo Images..." -ForegroundColor Cyan
+Write-Host "Building Backend Image..."
+docker build -t hackathon-backend:latest ./backend
 
-# Build Backend Image
-Write-Host "Building Backend Image..." -ForegroundColor Yellow
-docker build -t hackathon-backend:latest -f backend/Dockerfile backend/
+Write-Host "Building Frontend Image..."
+docker build -t hackathon-frontend:latest ./frontend
 
-# Build Frontend Image
-Write-Host "Building Frontend Image..." -ForegroundColor Yellow
-docker build -t hackathon-frontend:latest -f frontend/Dockerfile frontend/
-
-Write-Host "Images built successfully!" -ForegroundColor Green
+Write-Host "Images built successfully."
+Write-Host "NOTE: To use these in Minikube, run 'minikube image load hackathon-backend:latest' and 'minikube image load hackathon-frontend:latest'"

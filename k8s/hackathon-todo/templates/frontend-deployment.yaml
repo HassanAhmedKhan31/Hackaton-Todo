@@ -3,6 +3,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}-frontend
+  labels:
+    app: frontend
 spec:
   replicas: {{ .Values.frontend.replicas }}
   selector:
@@ -15,17 +17,10 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: {{ .Values.frontend.image }}
-          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag | default .Values.global.imageTag }}"
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
           ports:
             - containerPort: 3000
           env:
             - name: NEXT_PUBLIC_API_URL
-              # Assuming frontend calls backend via Service DNS name internally or relative path
-              # Since it's client-side, it might need the external NodePort URL
-              # But for Minikube local, we often point to localhost:NodePort or use a relative proxy
-              # For this specific task, we will point to the internal cluster DNS if it's SSR or just a placeholder
-              # NOTE: Client-side fetches in Next.js need a public URL. 
-              # For now, we'll set it to a placeholder or assume usage of a proxy.
-              # However, usually we set it to the ClusterIP service for SSR.
-              value: "http://{{ .Release.Name }}-backend:8000/api"
+              value: {{ .Values.frontend.apiUrl }}
