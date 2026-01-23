@@ -28,17 +28,11 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ .Release.Name }}-secrets
-              key: DATABASE_URL
-        - name: OPENROUTER_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}-secrets
-              key: OPENROUTER_API_KEY
-        # Also map OPENAI_API_KEY if needed, mirroring secrets.yaml
+              key: databaseUrl
         - name: OPENAI_API_KEY
           valueFrom:
             secretKeyRef:
               name: {{ .Release.Name }}-secrets
-              key: OPENAI_API_KEY
+              key: openaiApiKey
         ports:
         - containerPort: 8000

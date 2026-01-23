@@ -70,7 +70,7 @@ ingress:
   #      - chart-example.local
 
 secrets:
-  # These should be overridden by --set during helm install
-  databaseUrl: "postgresql://user:password@host:port/db"
-  openaiApiKey: "sk-..."
-  openrouterApiKey: "sk-..."
+  # These should be overridden by --set during helm install or via a secrets-values.yaml
+  databaseUrl: "SECRET_REQUIRED"
+  openaiApiKey: "SECRET_REQUIRED"
+  openrouterApiKey: "SECRET_REQUIRED"
