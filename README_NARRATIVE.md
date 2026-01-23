@@ -1,0 +1,7 @@
+### The "Sudden UI" Effect: Balancing Design and Real-Time Experience
+
+Our initial design faced a significant challenge: a 3-minute latency between task creation and UI updates. This delay, caused by a polling-based architecture, created a disjointed user experience, making the application feel sluggish and unresponsive. The core problem was a mismatch between our event-driven backend, powered by Kafka and Dapr, and a frontend that was unaware of real-time events. This latency undermined the core value proposition of a seamless, AI-driven task management tool.
+
+To solve this, we re-architected the frontend to embrace an event-driven mindset, creating what we call the "Sudden UI" effect. Instead of periodically polling for changes, the UI now intelligently triggers a data refresh precisely when an action is completed. The AI Assistant, upon successfully processing a task creation or modification, now provides an immediate signal to the frontend. This signal prompts the UI to fetch the latest tasks, ensuring the user sees their changes reflected almost instantaneously.
+
+This approach strikes a crucial balance between sophisticated backend networking and user-centric design. We leveraged the reliability of our asynchronous backend while creating a highly responsive and satisfying user experience. The result is a system that not only works efficiently behind the scenes but also feels intuitive and immediate to the end-user, bridging the gap between powerful technology and seamless interaction.
