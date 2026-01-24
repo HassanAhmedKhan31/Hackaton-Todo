@@ -14,7 +14,9 @@ export interface Task {
 }
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
+  baseURL: process.env.NODE_ENV === 'production' 
+    ? '/api' 
+    : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
 });
 
 console.log('API Base URL:', api.defaults.baseURL);

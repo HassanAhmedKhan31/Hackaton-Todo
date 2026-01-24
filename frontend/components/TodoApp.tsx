@@ -11,7 +11,7 @@ interface TodoAppProps {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function TodoApp({ tasks, setTasks, fetchTasks }: TodoAppProps) {
+export default function TodoApp({ tasks, setTasks, fetchTasks, loading, setLoading }: TodoAppProps) {
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -22,6 +22,7 @@ export default function TodoApp({ tasks, setTasks, fetchTasks }: TodoAppProps) {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
+    setLoading(true);
     try {
       await createTask(newTitle, newDesc);
       setNewTitle('');
@@ -30,6 +31,8 @@ export default function TodoApp({ tasks, setTasks, fetchTasks }: TodoAppProps) {
     } catch (error) {
       console.error("Failed to add task:", error);
       // Optionally, show an error message to the user
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -121,6 +124,7 @@ export default function TodoApp({ tasks, setTasks, fetchTasks }: TodoAppProps) {
           />
           <button
             type="submit"
+            disabled={loading}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus size={20} />

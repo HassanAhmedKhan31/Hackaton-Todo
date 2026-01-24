@@ -46,7 +46,7 @@ export default function ChatInterface({ fetchTasks }: ChatInterfaceProps) {
       ]);
 
       // Check if the assistant's message indicates a successful task operation
-      const refreshKeywords = ['processed', 'created', 'updated', 'deleted', 'completed', 'task processed successfully'];
+      const refreshKeywords = ['processed', 'created', 'updated', 'deleted', 'completed', 'task processed successfully', 'task created'];
       if (refreshKeywords.some(keyword => assistantMessage.toLowerCase().includes(keyword))) {
         console.log("Assistant response triggered a task refresh.");
         await fetchTasks();
