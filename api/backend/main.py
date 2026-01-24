@@ -33,6 +33,7 @@ origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     os.getenv("VERCEL_URL"), # Dynamically add Vercel production URL if available
+    "httpshttps://hackathon-todo-git-feat-k8s-final-himo-al.vercel.app", # Placeholder for your production URL
 ]
 
 app.add_middleware(
